@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface TodoService {
-  Todo create(String description, TodoType type);
+  Todo create(Long userId, String description, TodoType type);
 
   void update(Long todoId, String description, TodoType type);
 
@@ -17,7 +17,7 @@ public interface TodoService {
 
   void delete(Long todoId);
 
-  List<Todo> getTodoList(TodoStatus status, TodoType type, LocalDate date);
+  List<Todo> getTodoList(Long userId, TodoStatus status, TodoType type, LocalDate date);
 
   Todo getTodo(Long id);
 }

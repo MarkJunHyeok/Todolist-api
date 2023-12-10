@@ -7,6 +7,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.todo.list.common.user.domain.User;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -27,7 +28,7 @@ public class TodoReadRepositoryImpl implements TodoReadRepositoryCustom {
 
   @Override
   public List<Todo> getTodoList(
-      final TodoStatus status, final TodoType type, final LocalDate date) {
+      final User user, final TodoStatus status, final TodoType type, final LocalDate date) {
     final LocalDateTime startDateTime = date.atStartOfDay();
     final LocalDateTime endDateTime = startDateTime.plusDays(1);
 
@@ -40,6 +41,7 @@ public class TodoReadRepositoryImpl implements TodoReadRepositoryCustom {
         todo.createdAt.between(startZonedDateTime.toInstant(), endZonedDateTime.toInstant()));
     booleanBuilder.and(eqStatus(status));
     booleanBuilder.and(eqType(type));
+    booleanBuilder.and(todo.user.eq(user));
 
     final JPAQuery<Todo> query =
         this.queryFactory.selectFrom(todo).where(booleanBuilder).orderBy(todo.id.desc());

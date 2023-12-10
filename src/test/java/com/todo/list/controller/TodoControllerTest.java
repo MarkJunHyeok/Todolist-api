@@ -11,21 +11,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.todo.list.common.todo.domain.Todo;
 import com.todo.list.common.todo.domain.TodoRepository;
+import com.todo.list.common.user.domain.User;
+import com.todo.list.common.user.domain.UserRepository;
 import com.todo.list.controller.dto.TodoUpdateDTO;
 import com.todo.list.core.support.BaseApiTest;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 class TodoControllerTest extends BaseApiTest {
 
   @Autowired private TodoRepository todoRepository;
+  @Autowired private UserRepository userRepository;
+
+  private User user;
+
+  @BeforeEach
+  void setUp() {
+    this.user = userRepository.save(new User(1L));
+  }
 
   @Test
+  @WithUserDetails
   void Todo_생성_성공() throws Exception {
+    login(user);
+
     final Request request = new Request("description", SO_SO);
 
     this.mockMvc
@@ -44,8 +59,11 @@ class TodoControllerTest extends BaseApiTest {
   }
 
   @Test
+  @WithUserDetails
   void Todo_수정_성공() throws Exception {
-    final Todo todo = this.todoRepository.save(new Todo("description", SO_SO));
+    login(user);
+
+    final Todo todo = this.todoRepository.save(new Todo(user, "description", SO_SO));
 
     final TodoUpdateDTO.Request request = new TodoUpdateDTO.Request("description", SO_SO);
 
@@ -58,15 +76,21 @@ class TodoControllerTest extends BaseApiTest {
   }
 
   @Test
+  @WithUserDetails
   void Todo_완료() throws Exception {
-    final Todo todo = this.todoRepository.save(new Todo("description", SO_SO));
+    login(user);
+
+    final Todo todo = this.todoRepository.save(new Todo(user, "description", SO_SO));
 
     this.mockMvc.perform(patch("/todo/complete/{id}", todo.getId())).andExpect(status().isOk());
   }
 
   @Test
+  @WithUserDetails
   void Todo_완료_취소() throws Exception {
-    Todo todo = new Todo("description", SO_SO);
+    login(user);
+
+    Todo todo = new Todo(user, "description", SO_SO);
 
     todo.complete();
 
@@ -76,8 +100,11 @@ class TodoControllerTest extends BaseApiTest {
   }
 
   @Test
+  @WithUserDetails
   void Todo_삭제() throws Exception {
-    final Todo todo = this.todoRepository.save(new Todo("description", SO_SO));
+    login(user);
+
+    final Todo todo = this.todoRepository.save(new Todo(user, "description", SO_SO));
 
     this.mockMvc.perform(delete("/todo/{id}", todo.getId())).andExpect(status().isOk());
 
@@ -87,10 +114,13 @@ class TodoControllerTest extends BaseApiTest {
   }
 
   @Test
+  @WithUserDetails
   void Todolist_조회_성공() throws Exception {
-    final Todo todo1 = new Todo("GOOD", SO_SO);
-    final Todo todo2 = new Todo("GOOD", SO_SO);
-    final Todo todo3 = new Todo("FAKE", LEISURELY);
+    login(user);
+
+    final Todo todo1 = new Todo(user, "GOOD", SO_SO);
+    final Todo todo2 = new Todo(user, "GOOD", SO_SO);
+    final Todo todo3 = new Todo(user, "FAKE", LEISURELY);
 
     todoRepository.save(todo1);
     todoRepository.save(todo2);
@@ -108,8 +138,11 @@ class TodoControllerTest extends BaseApiTest {
   }
 
   @Test
+  @WithUserDetails
   void Todo_단건_조회_성공() throws Exception {
-    final Todo todo = this.todoRepository.save(new Todo("description", SO_SO));
+    login(user);
+
+    final Todo todo = this.todoRepository.save(new Todo(user, "description", SO_SO));
 
     this.mockMvc
         .perform(get("/todo/{id}", todo.getId()))

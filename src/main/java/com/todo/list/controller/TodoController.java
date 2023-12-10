@@ -10,9 +10,11 @@ import com.todo.list.controller.dto.TodoCreateDTO.Response;
 import com.todo.list.controller.dto.TodoUpdateDTO;
 import com.todo.list.core.response.ApiResult;
 import com.todo.list.core.response.Result;
+import com.todo.list.security.user.DefaultTodoUser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,8 +25,9 @@ public class TodoController {
   private final TodoService todoService;
 
   @PostMapping
-  public ResponseEntity<ApiResult<TodoCreateDTO.Response>> create(@RequestBody final Request req) {
-    final Todo todo = this.todoService.create(req.description(), req.type());
+  public ResponseEntity<ApiResult<TodoCreateDTO.Response>> create(
+      final @AuthenticationPrincipal DefaultTodoUser user, @RequestBody final Request req) {
+    final Todo todo = this.todoService.create(user.getId(), req.description(), req.type());
 
     final Response response = new Response(todo);
 
@@ -62,9 +65,11 @@ public class TodoController {
 
   @GetMapping
   public ResponseEntity<ApiResult<List<GetTodoListDTO.Response>>> getTodoList(
-      final GetTodoListDTO.Request request) {
+      final @AuthenticationPrincipal DefaultTodoUser user, final GetTodoListDTO.Request request) {
     final List<GetTodoListDTO.Response> todoList =
-        this.todoService.getTodoList(request.status(), request.type(), request.date()).stream()
+        this.todoService
+            .getTodoList(user.getId(), request.status(), request.type(), request.date())
+            .stream()
             .map(GetTodoListDTO.Response::new)
             .toList();
 

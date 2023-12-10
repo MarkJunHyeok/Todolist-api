@@ -3,6 +3,8 @@ package com.todo.list.common.todo.service;
 import static com.todo.list.core.util.Preconditions.validate;
 
 import com.todo.list.common.todo.domain.*;
+import com.todo.list.common.user.domain.User;
+import com.todo.list.common.user.domain.UserRepository;
 import com.todo.list.core.exception.ExceptionCode;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -17,10 +19,12 @@ public class DomainTodoService implements TodoService {
 
   private final TodoRepository todoRepository;
   private final TodoReadRepositoryCustom todoReadRepositoryCustom;
+  private final UserRepository userRepository;
 
   @Override
-  public Todo create(final String description, final TodoType type) {
-    final Todo todo = new Todo(description, type);
+  public Todo create(final Long userId, final String description, final TodoType type) {
+    final User user = userRepository.findById(userId).orElseThrow();
+    final Todo todo = new Todo(user, description, type);
 
     return this.todoRepository.save(todo);
   }
@@ -57,8 +61,9 @@ public class DomainTodoService implements TodoService {
 
   @Override
   public List<Todo> getTodoList(
-      final TodoStatus status, final TodoType type, final LocalDate date) {
-    return this.todoReadRepositoryCustom.getTodoList(status, type, date);
+      final Long userId, final TodoStatus status, final TodoType type, final LocalDate date) {
+    User user = userRepository.findById(userId).orElseThrow();
+    return this.todoReadRepositoryCustom.getTodoList(user, status, type, date);
   }
 
   @Override

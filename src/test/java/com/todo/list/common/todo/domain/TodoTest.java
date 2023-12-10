@@ -4,6 +4,7 @@ import static com.todo.list.common.todo.domain.TodoStatus.IN_PROGRESS;
 import static com.todo.list.common.todo.domain.TodoType.SO_SO;
 import static org.assertj.core.api.Assertions.*;
 
+import com.todo.list.common.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,20 +13,32 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 class TodoTest {
 
   private Todo todo;
+  private User user;
 
   @BeforeEach
   void setUp() {
-    this.todo = new Todo("description", SO_SO);
+    this.user = new User(1L);
+    this.todo = new Todo(user, "description", SO_SO);
   }
 
   @Test
   void Todo_생성_성공() {
-    final Todo todo = new Todo("description", SO_SO);
+    final Todo todo = new Todo(user, "description", SO_SO);
 
+    assertThat(todo.getUser()).isEqualTo(user);
     assertThat(todo.getDescription()).isEqualTo("description");
     assertThat(todo.getType()).isEqualTo(SO_SO);
     assertThat(todo.getStatus()).isEqualTo(IN_PROGRESS);
     assertThat(todo.getCreatedAt()).isNotNull();
+  }
+
+  @Test
+  void Todo_생성_실패__유저가_null() {
+    assertThatIllegalArgumentException()
+        .isThrownBy(
+            () -> {
+              new Todo(null, "description", SO_SO);
+            });
   }
 
   @ParameterizedTest
@@ -34,7 +47,7 @@ class TodoTest {
     assertThatIllegalArgumentException()
         .isThrownBy(
             () -> {
-              new Todo(description, SO_SO);
+              new Todo(user, description, SO_SO);
             });
   }
 
@@ -43,7 +56,7 @@ class TodoTest {
     assertThatIllegalArgumentException()
         .isThrownBy(
             () -> {
-              new Todo(" ", SO_SO);
+              new Todo(user, " ", SO_SO);
             });
   }
 
@@ -52,7 +65,7 @@ class TodoTest {
     assertThatIllegalArgumentException()
         .isThrownBy(
             () -> {
-              new Todo("description", null);
+              new Todo(user, "description", null);
             });
   }
 

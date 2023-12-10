@@ -21,23 +21,24 @@ spring:
       client:
         registration:
           github:
-            client-id: ${OAUTH2_CLIENT_ID:ec8464d8b354e015d312}
-            client-secret: ${OAUTH2_CLIENT_SECRET:a78e233e22fb91ff21ee7b1383bd0946a725b95b}
+            client-id: ${OAUTH2_CLIENT_ID:d3c1eecfb60e70ad8f07}
+            client-secret: ${OAUTH2_CLIENT_SECRET:a4856ee92b083e88ba51534a5bcec7141ff9bf1b}
             scope: user, user:email
-            redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:8000/login/oauth2/code/github}
+            redirect-uri: ${OAUTH2_REDIRECT_URI:http://43.203.35.49:8000/login/oauth2/code/github}
         provider:
           github:
             authorization-uri: https://github.com/login/oauth/authorize
             token-uri: https://github.com/login/oauth/access_token
             user-info-uri: https://api.github.com/user
             user-name-attribute: login
+
 server:
   port: 8000
 
 oauth2:
-  frontUri: ${FRONT_URI:http://localhost:3000/token}
+  frontUri: ${FRONT_URI:https://vuetodo.site/token}
 
 jwt:
-  secretKey: ${JWT_SECRET_KEY:testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttest}
-  accessTokenExpireTime: 180000
-  refreshTokenExpireTime: 600000
+  secretKey: ${JWT_SECRET_KEY:prodprodprodprodprodprodprodprodprodprodprodprodprodprodprodprodprodprodprodprod}
+  accessTokenExpireTime: 6000000
+  refreshTokenExpireTime: 6000000
